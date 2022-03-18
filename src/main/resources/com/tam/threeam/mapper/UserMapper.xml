@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tam.threeam.mapper.UserMapper">
+
+	<resultMap type="com.tam.threeam.model.User" id="UserMap">
+		<result property="userId" column="user_id" />
+		<result property="phoneNum" column="phone_num" />
+		<result property="refreshToken" column="refresh_token" />
+	</resultMap>
+
+   <insert id="join" parameterType="com.tam.threeam.model.User" useGeneratedKeys="true" keyProperty="id">
+      INSERT INTO user(user_id, password, name, phone_num, address, email)
+      VALUES(#{userId}, #{password}, #{name}, #{phoneNum}, #{address}, #{email})
+   </insert>
+
+	<select id="findUserById" parameterType="int" resultType="com.tam.threeam.model.User" resultMap="UserMap">
+		SELECT id, user_id, name, phone_num, address, email FROM user WHERE id=#{id}
+	</select>
+
+	<update id="updateUserInfo" parameterType="com.tam.threeam.model.User" >
+		UPDATE user SET name=#{name}, phone_num=#{phoneNum}, address=#{address}, email=#{email} WHERE id=#{id}
+		<!-- password=#{password} 패스워드 로직 구현까지 주석처리-->
+	</update>
+
+	<select id="findUserByUserId" parameterType="String" resultType="com.tam.threeam.model.User" resultMap="UserMap">
+		SELECT * FROM user WHERE user_id=#{userId}
+	</select>
+	
+
+	<select id="findPkByUserId" parameterType="String" resultType="int">
+		SELECT id FROM user WHERE user_id=#{userId}
+	</select>
+
+	<select id="checkUserId" resultType="java.lang.Integer" parameterType="String">
+		SELECT COUNT(*) FROM user WHERE user_id=#{userId}
+	</select>
+
+	<update id="updateRefreshToken" parameterType="String">
+		UPDATE user SET refresh_token=#{refreshToken} WHERE user_id=#{userId}
+	</update>
+
+
+</mapper>

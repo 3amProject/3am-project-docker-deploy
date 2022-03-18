@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tam.threeam.mapper.OrderMapper">
+	
+	<resultMap type="com.tam.threeam.model.OrderDetail" id="ProductMap">
+		<result property="productSeq" column="id"></result>
+		<result property="productName" column="product_name"></result>
+		<result property="productPrice" column="product_price"></result>
+	</resultMap>
+
+	<resultMap type="com.tam.threeam.model.OrderDetail" id="OrderDetailMap">
+   		<result property="orderSeq" column="order_seq"></result>
+   		<result property="productSeq" column="product_seq"></result>
+   		<result property="productQty" column="product_qty"></result>
+   		<result property="productPrice" column="product_price"></result>
+		<result property="productName" column="product_name"></result>
+	</resultMap>
+
+	<resultMap type="com.tam.threeam.model.Order" id="OrderMap">
+		<result property="id" column="id"></result>
+		<result property="userSeq" column="user_seq"></result>
+		<result property="phoneNum" column="phone_num"></result>
+		<result property="deliveryDate" column="delivery_date"></result>
+		<result property="orderDate" column="order_date"></result>
+		<result property="totalPrice" column="total_price"></result>
+		<result property="orderTotalPrice" column="order_total_price"></result>
+		<collection property="orderDetails" column="id" javaType="java.util.List" ofType="com.tam.threeam.model.OrderDetail" select="getOrderDetail"></collection>
+	</resultMap>
+
+
+	<!-- 주문 상품 정보 -->
+	<select id="getProductInfo" parameterType="int" resultMap="ProductMap">
+		SELECT id, product_name, product_price
+		FROM product
+		WHERE id=#{id}
+	</select>
+	
+	<!-- 주문 테이블 등록(주문 처리) -->
+	<insert id="insertOrder" parameterType="com.tam.threeam.model.Order" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO `order` SET id=#{id}, user_seq=#{userSeq}, username=#{username}, address=#{address}, phone_num=#{phoneNum}, email=#{email}, delivery_date=#{deliveryDate}, order_total_price=#{orderTotalPrice}, order_date=NOW()
+	</insert>
+
+	<!-- 주문 상세 테이블 등록(주문 처리) -->
+	<insert id="insertOrderDetail" parameterType="com.tam.threeam.model.OrderDetail" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO order_detail SET order_seq=#{orderSeq}, product_seq=#{productSeq}, product_qty=#{productQty}, product_price=#{productPrice}
+	</insert>
+
+	<!-- 주문 내역 전체 조회 -->
+	<select id="getOrderHistory" parameterType="int" resultMap="OrderMap">
+		SELECT id, user_seq, username, address, phone_num, email, delivery_date, order_date, order_total_price FROM `order` WHERE user_seq=#{userSeq} ORDER BY order_date DESC
+	</select>
+	
+	<!-- 주문 상품(orderDetail) 조회 -->
+	<select id="getOrderDetail" parameterType="String" resultMap="OrderDetailMap">
+		SELECT od.id, od.order_seq, od.product_seq, od.product_qty, od.product_price, p.product_name, (od.product_qty * od.product_price) totalPrice
+		FROM order_detail od
+		LEFT JOIN product p ON od.product_seq=p.id
+		WHERE od.order_seq=#{orderSeq}
+	</select>
+
+</mapper>

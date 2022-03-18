@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tam.threeam.mapper.CartMapper">
+
+
+	<resultMap type="com.tam.threeam.model.Product" id="ProductMap">
+		<result property="id" column="id"></result>
+		<result property="productName" column="product_name"></result>
+		<result property="productPrice" column="product_price"></result>
+		<result property="productQty" column="product_qty"></result>
+	</resultMap>
+
+	<resultMap type="com.tam.threeam.model.Cart" id="CartMap">
+		<result property="id" column="id"></result>
+		<result property="userSeq" column="user_seq"></result>
+		<result property="productSeq" column="product_seq"></result>
+		<result property="productQty" column="product_qty"></result>
+		<result property="deliveryDate" column="delivery_date"></result>
+		<result property="totalPrice" column="total_price"></result>
+		<result property="productName" column="product_name"></result>
+		<result property="price" column="product_price"></result>
+		<!-- <collection property="product" resultMap="ProductMap" /> -->
+		<!-- <collection property="totalPrice" column="user_seq" select="getTotalPrice" /> -->
+		<!-- <collection property="product" resultMap="Product"></collection> -->
+		<!-- <collection property="orders" column="order_seq" javaType="java.util.List" ofType="com.tam.threeam.model.OrderDetail" select="getOrderDetail" /> -->
+	</resultMap>
+
+	<select id="getProductList" resultType="com.tam.threeam.model.Product" resultMap="ProductMap">
+		SELECT * FROM product ORDER BY id ASC;
+	</select>
+
+	<insert id="insertCart" parameterType="com.tam.threeam.model.Cart" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO cart SET user_seq=#{userSeq}, product_seq=#{productSeq}, product_qty=#{productQty}, delivery_date=#{deliveryDate}, total_price=#{totalPrice}
+		<!-- DATE_FORMAT(c.delivery_date, '%Y-%m-%d') -->
+	</insert>
+
+	<select id="checkDuplicated" parameterType="com.tam.threeam.model.Cart" resultType="int">
+		SELECT COUNT(*) FROM cart WHERE user_seq=#{userSeq} AND product_seq=#{productSeq}
+	</select>
+
+	<update id="plusByProductSeq" parameterType="int">
+		UPDATE cart SET product_qty=product_qty +1 WHERE product_seq=#{productSeq}
+	</update>
+	
+	<update id="shiftCart" parameterType="map">
+		UPDATE cart SET userSeq=#{userSeq} WHERE cart_cookie_id=#{cartCookieId}
+	</update>
+	
+	<select id="getCartList" parameterType="int" resultMap="CartMap">
+		SELECT c.id, c.product_seq, c.product_qty, c.user_seq, p.product_name, p.product_price, c.delivery_date, IFNULL((c.product_qty * p.product_price), 0) total_price
+		FROM cart c
+		JOIN product p ON c.product_seq=p.id
+		WHERE c.user_seq=#{userSeq}
+		ORDER BY c.id DESC
+	</select>
+	
+	<select id="getTotalPrice" parameterType="int" resultMap="CartMap">
+		SELECT IFNULL(SUM(c.product_qty * p.product_price), 0)
+		FROM cart c
+		JOIN product p ON c.product_seq=p.id
+		WHERE c.user_seq=#{userSeq}
+	</select>
+	
+	<select id="checkProductQty" parameterType="Map" resultType="int">
+		SELECT product_qty FROM cart WHERE id=#{id} AND user_seq=#{userSeq}
+	</select>
+
+	<update id="plusProductQty" parameterType="Map">
+		UPDATE cart SET product_qty=product_qty +1 WHERE id=#{id} AND user_seq=#{userSeq}
+	</update>
+	
+	<update id="minusProductQty" parameterType="Map">
+		UPDATE cart SET product_qty=product_qty -1 WHERE id=#{id} AND user_seq=#{userSeq}
+	</update>
+
+	<delete id="deleteOne" parameterType="Map">
+		DELETE FROM cart WHERE id=#{id} AND user_seq=#{userSeq}
+	</delete>
+	
+	<delete id="deleteAllByUserSeq" parameterType="int">
+		DELETE FROM cart WHERE user_seq=#{userSeq}
+	</delete>
+	
+	<delete id="deleteAllByCookieId" parameterType="String">
+		DELETE FROM cart WHERE cart_cookie_id=#{cartCookieId}
+	</delete>
+	
+	<delete id="deleteOrderExpired" parameterType="int">
+		<![CDATA[
+			DELETE FROM cart WHERE DATE_ADD(DATE(), INTERVAL 2 DAY) > delivery_date AND user_seq=#{userSeq}
+		]]>
+		
+	</delete>
+	
+	<delete id="deleteOrder" parameterType="Map">
+		DELETE FROM cart WHERE user_seq=#{userSeq} AND product_seq=#{productSeq}
+	</delete>
+
+</mapper>

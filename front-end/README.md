@@ -1,29 +1,18 @@
 # 🚚 새벽 세시
 
-## [WIKI - 프로젝트 개요](https://github.com/3amProject/3am-project-fe/wiki)
-
-<br>
-
 ## 1. 서비스 소개(Introduction)
 
 식단 배송 서비스 [새벽다섯시](https://www.5am.co.kr/shop/calendar_shop.php)를 클론코딩하여, ‘새벽 세시’ 웹 서비스를 구현하는 프로젝트
 
 <br>
 
----
-
-<br>
-
 ## 2. 사용 스택 & 개발 환경(Stack)
-
-<br>
 
 ### Front-end
 
 - JavaScript(ES6)
 - React / React Router
 - Styled Component
-- axios
 
 ### Back-end
 
@@ -45,13 +34,9 @@
 
 - Windows, MacOS
 
----
-
 <br>
 
 ## 3. 주요 기능(Features)
-
-<br>
 
 - 회원가입 / 로그인
 - 회원 정보 조회 및 수정
@@ -63,57 +48,13 @@
 
 <br>
 
----
-
-<br>
-
 ## 4. ERD
-
-<br>
 
 ![image](https://user-images.githubusercontent.com/62868465/156756218-d4347393-d418-4376-baa3-3a97806527f8.png)
 
----
+## 5. 기술적 고민들(Challenges)
 
-<br>
-
-## 5. 배포
-
-<br>
-
-```bash
-# 퍼미션 설정
-$ sudo chmod 755 ./mvnw
-
-# 배포용 jar 생성
-$  ./mvnw clean package
-
-# 컨테이너 실행
-$ make up
-# 컨테이너 실행 (--force-recreate --build)
-$ make upf
-# 컨테이너 정지 & 삭제
-$ make down
-
-# 도커 시스템 정리
-$ docker system prune
-```
-
-## front-end
-
-http://localhost:8080
-
-## back-end
-
-http://localhost:8080/api
-
-<br>
-
----
-
-<br>
-
-## 6. 구현 화면(Preview)
+## 6. 배포(Preview)
 
 - 로그인 / 회원 정보 조회 화면
 
